@@ -1,10 +1,16 @@
+/* --------------------------------------------------------------
+   Global layout helpers
+-------------------------------------------------------------- */
 .layout {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #ffffff;
+  background: #fff;
 }
 
+/* --------------------------------------------------------------
+   Header – shared styles (desktop & mobile)
+-------------------------------------------------------------- */
 .header {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
@@ -17,15 +23,19 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
+/* Container that keeps everything centered */
 .header-content {
   max-width: 1200px;
   margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
+/* --------------------------------------------------------------
+   Logo
+-------------------------------------------------------------- */
 .logo {
   display: flex;
   align-items: center;
@@ -33,36 +43,7 @@
   text-decoration: none;
   transition: opacity 0.2s ease;
 }
-
-.logo:hover {
-  opacity: 0.8;
-}
-
-.logo-icon-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  background: #f3f4f6;
-  border-radius: 8px;
-  transition: background 0.2s ease;
-}
-
-.logo:hover .logo-icon-container {
-  background: #e5e7eb;
-}
-
-.logo-icon {
-  width: 16px;
-  height: 16px;
-  color: #6b7280;
-  transition: color 0.2s ease;
-}
-
-.logo:hover .logo-icon {
-  color: #374151;
-}
+.logo:hover { opacity: 0.8; }
 
 .logo-image {
   height: 28px;
@@ -70,33 +51,20 @@
   object-fit: contain;
   transition: opacity 0.2s ease, filter 0.3s ease;
 }
-
-/* Invert logo for dark backgrounds */
 @media (prefers-color-scheme: dark) {
-  .logo-image {
-    filter: invert(1);
-  }
+  .logo-image { filter: invert(1); }
 }
 
-.logo-text {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: 0.9375rem;
-  font-weight: 500;
-  color: #6b7280;
-  letter-spacing: -0.01em;
-  transition: color 0.2s ease;
-}
-
-.logo:hover .logo-text {
-  color: #374151;
-}
-
+/* --------------------------------------------------------------
+   Navigation (desktop)
+-------------------------------------------------------------- */
 .nav {
   display: flex;
   align-items: center;
   gap: 1.5rem;
 }
 
+/* Links */
 .nav-link {
   color: #374151;
   text-decoration: none;
@@ -105,17 +73,17 @@
   font-size: 0.9375rem;
   transition: color 0.2s ease;
 }
+.nav-link:hover { color: #1a1a1a; }
 
-.nav-link:hover {
-  color: #1a1a1a;
-}
-
-.auth-buttons {
+/* Auth / user area */
+.auth-buttons,
+.user-info {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
+/* Register button */
 .register-link {
   color: #1a1a1a;
   text-decoration: none;
@@ -126,23 +94,16 @@
   border-radius: 6px;
   transition: background 0.2s ease;
 }
+.register-link:hover { background: #f9fafb; }
 
-.register-link:hover {
-  background: #f9fafb;
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
+/* Pubkey display */
 .user-pubkey {
   font-size: 0.875rem;
   color: #666;
   font-family: monospace;
 }
 
+/* Logout button */
 .logout-button {
   padding: 0.5rem 1rem;
   background: #f3f4f6;
@@ -155,46 +116,94 @@
   color: #374151;
   transition: background 0.2s ease;
 }
+.logout-button:hover { background: #e5e7eb; }
 
-.logout-button:hover {
-  background: #e5e7eb;
+/* --------------------------------------------------------------
+   Hamburger (mobile only)
+-------------------------------------------------------------- */
+.hamburger {
+  display: none;               /* hidden on desktop */
+  flex-direction: column;
+  justify-content: space-between;
+  width: 24px;
+  height: 18px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+.hamburger span {
+  display: block;
+  height: 2px;
+  background: #374151;
+  border-radius: 1px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
+/* Animation when open */
+.hamburger.open span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
+/* --------------------------------------------------------------
+   Mobile‑first overrides (≤ 768 px)
+-------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .header { padding: 0 1rem; }
+  .header-content { height: 56px; }
+
+  /* Show hamburger */
+  .hamburger { display: flex; }
+
+  /* Hide nav by default, show when menuOpen */
+  .nav {
+    position: absolute;
+    top: 100%;                 /* just below the header */
+    left: 0;
+    right: 0;
+    background: rgba(255,255,255,0.97);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+    border-bottom: 1px solid #e5e7eb;
+    z-index: 99;
+  }
+
+  /* When the menu is opened */
+  .nav.mobile-open {
+    max-height: 500px;         /* enough for all items; you could use 100vh */
+    padding: 0.75rem 0;
+  }
+
+  .nav-link,
+  .register-link,
+  .logout-button {
+    padding: 0.75rem 1.5rem;
+    width: 100%;
+    text-align: left;
+  }
+
+  .auth-buttons,
+  .user-info {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.5rem 1.5rem;
+  }
+
+  .user-pubkey {
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* --------------------------------------------------------------
+   Main content helper (keeps footer at bottom)
+-------------------------------------------------------------- */
 .main-content {
   flex: 1;
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
 }
-
-@media (max-width: 768px) {
-  .header {
-    padding: 0 1rem;
-  }
-
-  .header-content {
-    height: 56px;
-  }
-
-  .logo-icon-container {
-    width: 28px;
-    height: 28px;
-  }
-
-  .logo-icon {
-    width: 14px;
-    height: 14px;
-  }
-
-  .logo-text {
-    font-size: 0.875rem;
-  }
-
-  .nav {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 1rem;
-  }
-}
-
-
