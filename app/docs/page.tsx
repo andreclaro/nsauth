@@ -172,7 +172,7 @@ export default function DocsPage() {
 
         {/* ==================== ARCHITECTURE DIAGRAM ==================== */}
         <section className="protocol-section">
-          <h2>System Architecture (Visual Overview)</h2>
+          <h2>System Architecture</h2>
           <div className="protocol-content">
             <div className="diagram-container">
               {/* The SVG diagram remains unchanged – it is purely visual and does not contain
