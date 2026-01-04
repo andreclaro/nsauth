@@ -133,7 +133,12 @@ Return only the exact role name that best matches the profile description.`;
           
           // If still no match, try word-based matching for common keywords
           if (!suggestedRole) {
-            const keywords = normalizedText.split(/\s+/);
+            // Split by whitespace and also handle apostrophes (e.g., "I'm" -> ["i", "m"])
+            const keywords = normalizedText
+              .replace(/'/g, ' ') // Replace apostrophes with spaces
+              .split(/\s+/)
+              .filter((k: string) => k.length > 0);
+            
             const keywordMap: Record<string, string> = {
               'developer': 'Technology & Innovation',
               'programmer': 'Technology & Innovation',
@@ -141,6 +146,7 @@ Return only the exact role name that best matches the profile description.`;
               'tech': 'Technology & Innovation',
               'software': 'Technology & Innovation',
               'code': 'Technology & Innovation',
+              'coding': 'Technology & Innovation',
               'president': 'Executive Leader / President',
               'executive': 'Executive Leader / President',
               'leader': 'Executive Leader / President',
@@ -159,7 +165,7 @@ Return only the exact role name that best matches the profile description.`;
             for (const keyword of keywords) {
               if (keywordMap[keyword]) {
                 suggestedRole = keywordMap[keyword];
-                console.log(`Matched role (keyword): ${role}`);
+                console.log(`Matched role (keyword): ${suggestedRole} from keyword: ${keyword}`);
                 break;
               }
             }
@@ -176,9 +182,46 @@ Return only the exact role name that best matches the profile description.`;
       }
     }
 
+    // If Gemini API failed, try keyword matching as fallback on the original input
     if (!suggestedRole) {
-      // If all models failed, return null so client can proceed without role tag
-      console.warn('Could not get role suggestion from any Gemini model');
+      console.warn('Could not get role suggestion from any Gemini model, trying keyword fallback');
+      const normalizedInput = about.trim().toLowerCase().replace(/'/g, ' ');
+      const keywords = normalizedInput.split(/\s+/).filter((k: string) => k.length > 0);
+      
+      const keywordMap: Record<string, string> = {
+        'developer': 'Technology & Innovation',
+        'programmer': 'Technology & Innovation',
+        'engineer': 'Technology & Innovation',
+        'tech': 'Technology & Innovation',
+        'software': 'Technology & Innovation',
+        'code': 'Technology & Innovation',
+        'coding': 'Technology & Innovation',
+        'president': 'Executive Leader / President',
+        'executive': 'Executive Leader / President',
+        'leader': 'Executive Leader / President',
+        'education': 'Education & Research',
+        'teacher': 'Education & Research',
+        'research': 'Education & Research',
+        'health': 'Health & Human Services',
+        'doctor': 'Health & Human Services',
+        'medical': 'Health & Human Services',
+        'finance': 'Treasury / Finance Minister',
+        'treasury': 'Treasury / Finance Minister',
+        'economic': 'Economic Development',
+        'economy': 'Economic Development',
+      };
+      
+      for (const keyword of keywords) {
+        if (keywordMap[keyword]) {
+          suggestedRole = keywordMap[keyword];
+          console.log(`Matched role (fallback keyword): ${suggestedRole} from keyword: ${keyword}`);
+          break;
+        }
+      }
+    }
+
+    if (!suggestedRole) {
+      console.warn('Could not get role suggestion from any method');
       return NextResponse.json({ role: null });
     }
 
