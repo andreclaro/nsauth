@@ -310,7 +310,7 @@ export function MembershipPage() {
                           <div className="profile-about">{profile.about}</div>
                         )}
                         {member.petname && (
-                          <div className="profile-petname">Petname: {member.petname}</div>
+                          <div className="profile-petname">Name: {member.petname}</div>
                         )}
                       </div>
                     </div>

@@ -16,16 +16,9 @@ export function LoginButton() {
     setIsLoading(true);
     setLoginError(null);
 
-    // #region agent log
-    fetch('http://127.0.0.1:7246/ingest/e0050ae4-a9d1-45cf-bda1-b00e70e9994b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'LoginButton.tsx:16',message:'handleLogin entry',data:{hasKeyInfo:nosskeyService.hasKeyInfo()},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
-
     try {
       // Check if key info exists
       if (!nosskeyService.hasKeyInfo()) {
-        // #region agent log
-        fetch('http://127.0.0.1:7246/ingest/e0050ae4-a9d1-45cf-bda1-b00e70e9994b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'LoginButton.tsx:22',message:'Throwing error - no account found',data:{errorMessage:'No account found. Please register first.'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-        // #endregion
         throw new Error('No account found. Please register first.');
       }
 
@@ -46,9 +39,6 @@ export function LoginButton() {
     } catch (err) {
       console.error('Login error:', err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to login';
-      // #region agent log
-      fetch('http://127.0.0.1:7246/ingest/e0050ae4-a9d1-45cf-bda1-b00e70e9994b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'LoginButton.tsx:41',message:'Setting error state',data:{errorMessage,errorType:err instanceof Error ? err.constructor.name : typeof err},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-      // #endregion
       setLoginError(errorMessage);
       setIsLoading(false);
     }

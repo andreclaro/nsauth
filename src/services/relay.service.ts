@@ -16,8 +16,7 @@ import type { VerificationProof, VerificationStatus } from '../types/verificatio
  * in the console are likely false positives from internal checks.
  */
 const DEFAULT_RELAYS = [
-  'wss://relay.damus.io',
-  'wss://nos.lol',
+  "wss://relay.damus.io"
   // Removed relay.nostr.band temporarily due to potential connection issues
 ];
 
@@ -45,7 +44,7 @@ class RelayService {
   /**
    * Publish an event to relays
    */
-  async publishEvent(event: NostrEvent, timeoutMs = 10000): Promise<boolean> {
+  async publishEvent(event: NostrEvent, timeoutMs = 1000): Promise<boolean> {
     return new Promise((resolve, reject) => {
       if (this.relayUrls.length === 0) {
         reject(new Error('No relays configured'));
@@ -59,7 +58,7 @@ class RelayService {
       const subscription = this.rxNostr.send(event).subscribe({
         next: (response) => {
           console.log(`Response from ${response.from}:`, response);
-
+          console.log(event)
           // Count successful responses
           if (response.type === 'OK') {
             successCount++;
@@ -227,7 +226,7 @@ class RelayService {
         .use(req)
         .pipe(
           uniq(),
-          completeOnTimeout(10000)
+          completeOnTimeout(1000)
         )
         .subscribe({
           next: (packet) => {

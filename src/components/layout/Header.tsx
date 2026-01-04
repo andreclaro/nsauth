@@ -56,8 +56,8 @@ export function Header() {
       // Set as authenticated
       setAuthenticated(keyInfo);
 
-      // Redirect to graph page
-      router.push('/graph');
+      // Redirect to docs page
+      router.push('/');
     } catch (err) {
       console.error('Login error:', err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to login';
@@ -73,7 +73,7 @@ export function Header() {
     <header className="header">
       <div className="header-content">
         {/* Logo */}
-        <Link href="/" className="logo">
+        <Link href="/docs" className="logo">
           <img
             src="/network-state-plus-flag-logo.png"
             alt="Network School"
