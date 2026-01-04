@@ -198,7 +198,7 @@ Return only the exact category name:`;
           }
           
           // Normalize the text: remove quotes, extra whitespace, and make lowercase for comparison
-          let normalizedText = trimmedText
+          const normalizedText = trimmedText
             .replace(/^["']|["']$/g, '') // Remove surrounding quotes
             .replace(/^[0-9]+\.\s*/, '') // Remove leading numbers like "1. "
             .replace(/^category:\s*/i, '') // Remove "Category:" prefix

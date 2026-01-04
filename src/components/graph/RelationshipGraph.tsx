@@ -137,7 +137,13 @@ export function RelationshipGraph() {
       <div className="graph-wrapper">
         <ForceGraph2D
           ref={graphRef}
-          graphData={graphData}
+          graphData={{
+            nodes: graphData.nodes,
+            links: graphData.edges.map(edge => ({
+              source: edge.source,
+              target: edge.target
+            }))
+          }}
           nodeLabel={(node: any) => {
             return `${node.label || node.id.slice(0, 8)}\n${node.pubkey.slice(0, 16)}...`;
           }}
