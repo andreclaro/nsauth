@@ -26,7 +26,7 @@ export default function HomePage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.replace('/');
+      router.replace('/profile');
     }
   }, [isAuthenticated, router]);
 
