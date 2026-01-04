@@ -21,6 +21,7 @@ export function ProfilePage() {
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [showVerification, setShowVerification] = useState(false);
   const [suggestedRole, setSuggestedRole] = useState<string | null>(null);
+  const [isGettingRole, setIsGettingRole] = useState(false);
   const [formData, setFormData] = useState<ProfileMetadata>({
     name: '',
     display_name: '',
@@ -44,7 +45,11 @@ export function ProfilePage() {
 
     setIsLoading(true);
     try {
-      const profile = await relayService.fetchProfile(publicKey);
+      const [profile, roleTag] = await Promise.all([
+        relayService.fetchProfile(publicKey),
+        relayService.fetchProfileRoleTag(publicKey),
+      ]);
+      
       if (profile) {
         setFormData({
           name: profile.name || '',
@@ -53,6 +58,11 @@ export function ProfilePage() {
           picture: profile.picture || '',
           website: profile.website || '',
         });
+      }
+      
+      if (roleTag) {
+        setSuggestedRole(roleTag);
+        console.log('Loaded role tag from profile:', roleTag);
       }
     } catch (error) {
       console.error('Failed to load profile:', error);
@@ -172,18 +182,25 @@ export function ProfilePage() {
       // Suggest role based on "about" field if it has content
       let roleSuggestion: string | null = null;
       if (formData.about && formData.about.trim().length > 0) {
+        setIsGettingRole(true);
         try {
+          console.log('Calling Gemini API for role suggestion...');
           roleSuggestion = await geminiService.suggestRole(formData.about);
+          console.log('Received role suggestion:', roleSuggestion);
           if (roleSuggestion) {
             tags.push(['role', roleSuggestion]);
             setSuggestedRole(roleSuggestion);
+            console.log('Role tag set:', roleSuggestion);
           } else {
             setSuggestedRole(null);
+            console.log('No role suggestion received');
           }
         } catch (error) {
           // Log error but continue with profile save without role tag
           console.error('Failed to get role suggestion:', error);
           setSuggestedRole(null);
+        } finally {
+          setIsGettingRole(false);
         }
       } else {
         setSuggestedRole(null);
@@ -319,12 +336,23 @@ export function ProfilePage() {
             </div>
           )}
 
-          {suggestedRole && (
+          {(isGettingRole || suggestedRole) && (
             <div className="role-tag-container">
-              <div className="role-tag-label">AI Suggested Role:</div>
-              <div className="role-tag">
-                {suggestedRole}
-              </div>
+              {isGettingRole ? (
+                <>
+                  <div className="role-tag-label">Getting AI suggestion...</div>
+                  <div className="role-tag-loading">
+                    <div className="role-tag-spinner"></div>
+                  </div>
+                </>
+              ) : suggestedRole ? (
+                <>
+                  <div className="role-tag-label">AI Suggested Role:</div>
+                  <div className="role-tag">
+                    {suggestedRole}
+                  </div>
+                </>
+              ) : null}
             </div>
           )}
 
