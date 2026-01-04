@@ -20,6 +20,7 @@ export function ProfilePage() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [showVerification, setShowVerification] = useState(false);
+  const [suggestedRole, setSuggestedRole] = useState<string | null>(null);
   const [formData, setFormData] = useState<ProfileMetadata>({
     name: '',
     display_name: '',
@@ -169,16 +170,23 @@ export function ProfilePage() {
       }
 
       // Suggest role based on "about" field if it has content
+      let roleSuggestion: string | null = null;
       if (formData.about && formData.about.trim().length > 0) {
         try {
-          const suggestedRole = await geminiService.suggestRole(formData.about);
-          if (suggestedRole) {
-            tags.push(['role', suggestedRole]);
+          roleSuggestion = await geminiService.suggestRole(formData.about);
+          if (roleSuggestion) {
+            tags.push(['role', roleSuggestion]);
+            setSuggestedRole(roleSuggestion);
+          } else {
+            setSuggestedRole(null);
           }
         } catch (error) {
           // Log error but continue with profile save without role tag
           console.error('Failed to get role suggestion:', error);
+          setSuggestedRole(null);
         }
+      } else {
+        setSuggestedRole(null);
       }
 
       const event = {
@@ -298,6 +306,15 @@ export function ProfilePage() {
           {saveMessage && (
             <div className={`save-message ${saveMessage.includes('Error') ? 'error' : 'success'}`}>
               {saveMessage}
+            </div>
+          )}
+
+          {suggestedRole && (
+            <div className="role-tag-container">
+              <div className="role-tag-label">AI Suggested Role:</div>
+              <div className="role-tag">
+                {suggestedRole}
+              </div>
             </div>
           )}
 

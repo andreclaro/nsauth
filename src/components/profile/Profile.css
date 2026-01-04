@@ -191,4 +191,41 @@
   }
 }
 
+.role-tag-container {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f0f9ff;
+  border: 2px solid #bae6fd;
+  border-radius: 8px;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.role-tag-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #0369a1;
+  margin-bottom: 0.5rem;
+}
+
+.role-tag {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: #2563eb;
+  color: white;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 
