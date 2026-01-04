@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import dynamic from 'next/dynamic';
 import { useAuthStore } from '../../store/authStore';
 import { graphService } from '../../services/graph.service';
 import type { GraphData } from '../../types/nostr';
@@ -11,26 +12,32 @@ if (typeof window !== 'undefined' && !(window as any).AFRAME) {
   (window as any).AFRAME = { components: {}, systems: {}, scenes: [] };
 }
 
+// Dynamically import ForceGraph2D with SSR disabled
+const ForceGraph2D = dynamic(
+  () => import('react-force-graph').then((mod) => {
+    if (!mod.ForceGraph2D) {
+      throw new Error('ForceGraph2D not found in react-force-graph');
+    }
+    return mod.ForceGraph2D;
+  }),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="loading-state">
+        <div className="spinner"></div>
+        <p>Loading graph visualization...</p>
+      </div>
+    )
+  }
+);
+
 export function RelationshipGraph() {
   const publicKey = useAuthStore((state) => state.publicKey);
   const [graphData, setGraphData] = useState<GraphData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
-  const [ForceGraph2D, setForceGraph2D] = useState<any>(null);
   const graphRef = useRef<any>();
-
-  // Load graph component dynamically
-  useEffect(() => {
-    import('react-force-graph')
-      .then((module) => {
-        setForceGraph2D(() => module.ForceGraph2D);
-      })
-      .catch((err) => {
-        console.error('Failed to load graph component:', err);
-        setError('Failed to load graph visualization library');
-      });
-  }, []);
 
   useEffect(() => {
     if (!publicKey) {
@@ -128,34 +135,27 @@ export function RelationshipGraph() {
       </div>
 
       <div className="graph-wrapper">
-        {ForceGraph2D ? (
-          <ForceGraph2D
-            ref={graphRef}
-            graphData={graphData}
-            nodeLabel={(node: any) => {
-              return `${node.label || node.id.slice(0, 8)}\n${node.pubkey.slice(0, 16)}...`;
-            }}
-            nodeColor={getNodeColor}
-            nodeVal={getNodeSize}
-            linkColor={() => 'rgba(0, 0, 0, 0.2)'}
-            linkWidth={1}
-            onNodeClick={(node: any) => {
-              setSelectedNode(node.id === selectedNode ? null : node.id);
-            }}
-            onNodeHover={(_node: any) => {
-              // Cursor will be handled by CSS
-            }}
-            cooldownTicks={100}
-            onEngineStop={() => {
-              graphRef.current?.zoomToFit(400, 20);
-            }}
-          />
-        ) : (
-          <div className="loading-state">
-            <div className="spinner"></div>
-            <p>Loading graph visualization...</p>
-          </div>
-        )}
+        <ForceGraph2D
+          ref={graphRef}
+          graphData={graphData}
+          nodeLabel={(node: any) => {
+            return `${node.label || node.id.slice(0, 8)}\n${node.pubkey.slice(0, 16)}...`;
+          }}
+          nodeColor={getNodeColor}
+          nodeVal={getNodeSize}
+          linkColor={() => 'rgba(0, 0, 0, 0.2)'}
+          linkWidth={1}
+          onNodeClick={(node: any) => {
+            setSelectedNode(node.id === selectedNode ? null : node.id);
+          }}
+          onNodeHover={(_node: any) => {
+            // Cursor will be handled by CSS
+          }}
+          cooldownTicks={100}
+          onEngineStop={() => {
+            graphRef.current?.zoomToFit(400, 20);
+          }}
+        />
       </div>
 
       {selectedNode && (

@@ -91,20 +91,81 @@ Return only the exact role name that best matches the profile description.`;
           const text = data.candidates[0].content.parts[0]?.text || '';
           const trimmedText = text.trim();
           
-          // Try to find an exact match from the roles list
+          // Log the raw response for debugging
+          console.log(`Gemini API response (${model}):`, trimmedText);
+          
+          // Normalize the text: remove quotes, extra whitespace, and make lowercase for comparison
+          const normalizedText = trimmedText
+            .replace(/^["']|["']$/g, '') // Remove surrounding quotes
+            .replace(/^[0-9]+\.\s*/, '') // Remove leading numbers like "1. "
+            .trim()
+            .toLowerCase();
+          
+          // Try to find an exact match (case-insensitive, ignoring quotes and numbers)
           for (const role of ROLES) {
-            if (trimmedText.includes(role)) {
+            const normalizedRole = role.toLowerCase();
+            if (normalizedText === normalizedRole || normalizedText.includes(normalizedRole)) {
               suggestedRole = role;
+              console.log(`Matched role: ${role}`);
               break;
             }
           }
           
-          // If no exact match, try to find a partial match or use the first line
+          // If no exact match, try to find a partial match using the first line
           if (!suggestedRole) {
-            const firstLine = trimmedText.split('\n')[0].trim();
+            const firstLine = trimmedText.split('\n')[0]
+              .replace(/^["']|["']$/g, '')
+              .replace(/^[0-9]+\.\s*/, '')
+              .trim()
+              .toLowerCase();
+            
             for (const role of ROLES) {
-              if (firstLine === role || firstLine.includes(role) || role.includes(firstLine)) {
+              const normalizedRole = role.toLowerCase();
+              if (firstLine === normalizedRole || 
+                  firstLine.includes(normalizedRole) || 
+                  normalizedRole.includes(firstLine)) {
                 suggestedRole = role;
+                console.log(`Matched role (partial): ${role}`);
+                break;
+              }
+            }
+          }
+          
+          // If still no match, try word-based matching for common keywords
+          if (!suggestedRole) {
+            // Split by whitespace and also handle apostrophes (e.g., "I'm" -> ["i", "m"])
+            const keywords = normalizedText
+              .replace(/'/g, ' ') // Replace apostrophes with spaces
+              .split(/\s+/)
+              .filter((k: string) => k.length > 0);
+            
+            const keywordMap: Record<string, string> = {
+              'developer': 'Technology & Innovation',
+              'programmer': 'Technology & Innovation',
+              'engineer': 'Technology & Innovation',
+              'tech': 'Technology & Innovation',
+              'software': 'Technology & Innovation',
+              'code': 'Technology & Innovation',
+              'coding': 'Technology & Innovation',
+              'president': 'Executive Leader / President',
+              'executive': 'Executive Leader / President',
+              'leader': 'Executive Leader / President',
+              'education': 'Education & Research',
+              'teacher': 'Education & Research',
+              'research': 'Education & Research',
+              'health': 'Health & Human Services',
+              'doctor': 'Health & Human Services',
+              'medical': 'Health & Human Services',
+              'finance': 'Treasury / Finance Minister',
+              'treasury': 'Treasury / Finance Minister',
+              'economic': 'Economic Development',
+              'economy': 'Economic Development',
+            };
+            
+            for (const keyword of keywords) {
+              if (keywordMap[keyword]) {
+                suggestedRole = keywordMap[keyword];
+                console.log(`Matched role (keyword): ${suggestedRole} from keyword: ${keyword}`);
                 break;
               }
             }
@@ -121,9 +182,46 @@ Return only the exact role name that best matches the profile description.`;
       }
     }
 
+    // If Gemini API failed, try keyword matching as fallback on the original input
     if (!suggestedRole) {
-      // If all models failed, return null so client can proceed without role tag
-      console.warn('Could not get role suggestion from any Gemini model');
+      console.warn('Could not get role suggestion from any Gemini model, trying keyword fallback');
+      const normalizedInput = about.trim().toLowerCase().replace(/'/g, ' ');
+      const keywords = normalizedInput.split(/\s+/).filter((k: string) => k.length > 0);
+      
+      const keywordMap: Record<string, string> = {
+        'developer': 'Technology & Innovation',
+        'programmer': 'Technology & Innovation',
+        'engineer': 'Technology & Innovation',
+        'tech': 'Technology & Innovation',
+        'software': 'Technology & Innovation',
+        'code': 'Technology & Innovation',
+        'coding': 'Technology & Innovation',
+        'president': 'Executive Leader / President',
+        'executive': 'Executive Leader / President',
+        'leader': 'Executive Leader / President',
+        'education': 'Education & Research',
+        'teacher': 'Education & Research',
+        'research': 'Education & Research',
+        'health': 'Health & Human Services',
+        'doctor': 'Health & Human Services',
+        'medical': 'Health & Human Services',
+        'finance': 'Treasury / Finance Minister',
+        'treasury': 'Treasury / Finance Minister',
+        'economic': 'Economic Development',
+        'economy': 'Economic Development',
+      };
+      
+      for (const keyword of keywords) {
+        if (keywordMap[keyword]) {
+          suggestedRole = keywordMap[keyword];
+          console.log(`Matched role (fallback keyword): ${suggestedRole} from keyword: ${keyword}`);
+          break;
+        }
+      }
+    }
+
+    if (!suggestedRole) {
+      console.warn('Could not get role suggestion from any method');
       return NextResponse.json({ role: null });
     }
 
