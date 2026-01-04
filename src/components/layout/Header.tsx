@@ -23,12 +23,7 @@ export function Header() {
     <header className="header">
       <div className="header-content">
         <Link href="/" className="logo">
-          <div className="logo-icon-container">
-            <svg className="logo-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M8 2V14M2 8H14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-          </div>
-          <span className="logo-text">ns.com</span>
+          <img src="/ns-com-logo.png" alt="Network School" className="logo-image" />
         </Link>
 
         <nav className="nav">

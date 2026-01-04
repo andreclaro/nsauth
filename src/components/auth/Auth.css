@@ -45,6 +45,46 @@
   font-size: 1.5rem;
 }
 
+.username-section {
+  margin-bottom: 1.5rem;
+}
+
+.username-label {
+  display: block;
+  color: #444;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.username-input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #1a1a1a;
+  background: white;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.username-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.username-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #f9fafb;
+}
+
+.username-input::placeholder {
+  color: #9ca3af;
+}
+
 .auth-button {
   width: 100%;
   padding: 0.875rem 1.5rem;
@@ -160,5 +200,3 @@
   align-items: flex-end;
   gap: 0.5rem;
 }
-
-
