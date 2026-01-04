@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { nosskeyService } from '../../services/nosskey.service';
 import { relayService } from '../../services/relay.service';
+import { geminiService } from '../../services/gemini.service';
 import { useAuthStore } from '../../store/authStore';
 import { useVerification } from '../../hooks/useVerification';
 import { VerificationFlow } from '../verification/VerificationFlow';
@@ -165,6 +166,19 @@ export function ProfilePage() {
       const tags: string[][] = [];
       if (uniqueIdentifier) {
         tags.push(['passport', uniqueIdentifier]);
+      }
+
+      // Suggest role based on "about" field if it has content
+      if (formData.about && formData.about.trim().length > 0) {
+        try {
+          const suggestedRole = await geminiService.suggestRole(formData.about);
+          if (suggestedRole) {
+            tags.push(['role', suggestedRole]);
+          }
+        } catch (error) {
+          // Log error but continue with profile save without role tag
+          console.error('Failed to get role suggestion:', error);
+        }
       }
 
       const event = {

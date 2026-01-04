@@ -86,16 +86,6 @@ function HomePage() {
           everyday trust layer that lets you work, learn, travel, and govern
           with confidence and autonomy.
         </p>
-
-        {/* ---------- Call‑to‑Action Buttons ---------- */}
-        <div className="home-actions">
-          <a href="/register" className="cta-button primary">
-            Get Started
-          </a>
-          <a href="/register" className="cta-button secondary">
-            Learn More
-          </a>
-        </div>
       </div>
     </div>
   );
