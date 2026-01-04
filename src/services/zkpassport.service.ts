@@ -168,6 +168,69 @@ class ZKPassportService {
   }
 
   /**
+   * Request combined member verification (age >= 18 + KYC with name disclosure)
+   */
+  async requestMemberVerification(sessionId?: string): Promise<VerificationRequestResult & { sessionId: string }> {
+    const zkPassport = this.getZKPassport();
+    const sid = sessionId || this.generateSessionId();
+    const backendUrl = this.getBackendUrl();
+
+    const logoUrl =
+      typeof window !== 'undefined' ? `${window.location.origin}/vite.svg` : 'https://example.com/logo.svg';
+
+    const queryBuilder = await zkPassport.request({
+      name: 'NS Auth',
+      logo: logoUrl,
+      purpose: 'Verify you are a member (18+ and KYC verified)',
+      scope: 'member-verification',
+    });
+
+    // Request age >= 18 AND disclose firstname/lastname
+    const { url, onResult } = queryBuilder
+      .gte('age', 18)
+      .disclose('firstname' as any)
+      .disclose('lastname' as any)
+      .disclose('nationality' as any)
+      .done();
+
+    return {
+      sessionId: sid,
+      url,
+      onResult: (callback: (result: VerificationCallbackResult) => void) => {
+        // Set up polling for result from backend
+        const pollInterval = setInterval(async () => {
+          try {
+            const response = await fetch(`${backendUrl}/api/verification/result/${sid}`);
+            const data = await response.json();
+            
+            if (data.found) {
+              clearInterval(pollInterval);
+              callback(data.result);
+            }
+          } catch (error) {
+            console.error('Polling error:', error);
+          }
+        }, 1000); // Poll every second
+
+        // Cleanup after 5 minutes
+        setTimeout(() => {
+          clearInterval(pollInterval);
+        }, 5 * 60 * 1000);
+
+        // Also set up original callback as fallback
+        onResult((response) => {
+          clearInterval(pollInterval);
+          callback({
+            verified: response.verified,
+            uniqueIdentifier: response.uniqueIdentifier,
+            result: response.result,
+          });
+        });
+      },
+    };
+  }
+
+  /**
    * Request personhood verification (prove person from country)
    */
   async requestPersonhoodVerification(_country?: string, sessionId?: string): Promise<VerificationRequestResult & { sessionId: string }> {

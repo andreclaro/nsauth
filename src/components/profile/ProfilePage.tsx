@@ -64,7 +64,7 @@ export function ProfilePage() {
    */
   const getPassportData = (): { firstname?: string; lastname?: string } | null => {
     // Check all verification types for passport data
-    const verificationTypes: Array<'age' | 'kyc' | 'personhood'> = ['age', 'kyc', 'personhood'];
+    const verificationTypes: Array<'age' | 'kyc'> = ['age', 'kyc'];
     
     for (const type of verificationTypes) {
       const proof = getVerification(type);
@@ -156,12 +156,22 @@ export function ProfilePage() {
         return;
       }
 
-      // Create Kind 0 event
+      // Get uniqueIdentifier from verification proofs (prefer KYC, fallback to age)
+      const kycProof = getVerification('kyc');
+      const ageProof = getVerification('age');
+      const uniqueIdentifier = kycProof?.uniqueIdentifier || ageProof?.uniqueIdentifier;
+
+      // Create Kind 0 event with uniqueIdentifier tag if available
+      const tags: string[][] = [];
+      if (uniqueIdentifier) {
+        tags.push(['passport', uniqueIdentifier]);
+      }
+
       const event = {
         kind: 0,
         content: JSON.stringify(formData),
         created_at: Math.floor(Date.now() / 1000),
-        tags: [],
+        tags,
       };
 
       // Sign event
@@ -301,7 +311,6 @@ export function ProfilePage() {
             <div className="verification-badges">
               <VerificationBadge type="age" verified={isVerified('age')} />
               <VerificationBadge type="kyc" verified={isVerified('kyc')} />
-              <VerificationBadge type="personhood" verified={isVerified('personhood')} />
             </div>
           </div>
 
@@ -310,7 +319,7 @@ export function ProfilePage() {
               className="verification-toggle-button"
               onClick={() => setShowVerification(true)}
             >
-              {isVerified('age') || isVerified('kyc') || isVerified('personhood')
+              {isVerified('age') || isVerified('kyc')
                 ? 'Manage Verifications'
                 : 'Verify Identity'}
             </button>

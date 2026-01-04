@@ -206,6 +206,55 @@
   font-size: 0.875rem;
 }
 
+.name-confirmation-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.name-confirmation-section .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.name-confirmation-section .form-group label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.875rem;
+}
+
+.name-input {
+  padding: 0.75rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+  width: 100%;
+}
+
+.name-input:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+.verification-actions {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.verification-actions .verification-button {
+  flex: 1;
+}
+
+.verification-actions .cancel-button {
+  flex: 1;
+}
+
 @media (max-width: 768px) {
   .verification-flow {
     padding: 1rem;
