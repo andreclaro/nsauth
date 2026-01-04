@@ -350,6 +350,111 @@ class RelayService {
       ]);
     });
   }
+
+  /**
+   * Query kind 0 events (profiles) by pubkey
+   * If pubkeys array is empty, fetches recent kind 0 events
+   */
+  async queryProfiles(pubkeys: string[] = [], limit = 100): Promise<Map<string, ProfileMetadata>> {
+    return new Promise((resolve) => {
+      const req = createRxBackwardReq();
+      const profiles = new Map<string, { metadata: ProfileMetadata; timestamp: number }>();
+      let resolved = false;
+
+      this.rxNostr
+        .use(req)
+        .pipe(
+          uniq(),
+          completeOnTimeout(10000)
+        )
+        .subscribe({
+          next: (packet) => {
+            if (packet.event && packet.event.kind === 0 && packet.event.pubkey) {
+              try {
+                const metadata = JSON.parse(packet.event.content) as ProfileMetadata;
+                const timestamp = packet.event.created_at || 0;
+                // Keep only the latest profile for each pubkey
+                const existing = profiles.get(packet.event.pubkey);
+                if (!existing || timestamp > existing.timestamp) {
+                  profiles.set(packet.event.pubkey, { metadata, timestamp });
+                }
+              } catch (error) {
+                console.error('Failed to parse profile metadata:', error);
+              }
+            }
+          },
+          complete: () => {
+            if (!resolved) {
+              resolved = true;
+              // Convert to Map<string, ProfileMetadata>
+              const result = new Map<string, ProfileMetadata>();
+              profiles.forEach((value, pubkey) => {
+                result.set(pubkey, value.metadata);
+              });
+              resolve(result);
+            }
+          },
+          error: (error) => {
+            console.error('Error querying profiles:', error);
+            if (!resolved) {
+              resolved = true;
+              // Convert to Map<string, ProfileMetadata>
+              const result = new Map<string, ProfileMetadata>();
+              profiles.forEach((value, pubkey) => {
+                result.set(pubkey, value.metadata);
+              });
+              resolve(result);
+            }
+          },
+        })
+        .unsubscribe();
+
+      const filter: any = {
+        kinds: [0],
+        limit,
+      };
+
+      if (pubkeys.length > 0) {
+        filter.authors = pubkeys;
+      }
+
+      req.emit([filter]);
+    });
+  }
+
+  /**
+   * Publish or update a kind 3 event (follow list/contacts)
+   */
+  async publishFollowList(
+    pubkey: string,
+    followList: FollowEntry[],
+    signEvent: (event: NostrEvent) => Promise<NostrEvent>
+  ): Promise<boolean> {
+    // Create tags from follow list
+    const tags: string[][] = followList.map((entry) => {
+      const tag: string[] = ['p', entry.pubkey];
+      if (entry.relay) {
+        tag.push(entry.relay);
+      }
+      if (entry.petname) {
+        tag.push(entry.petname);
+      }
+      return tag;
+    });
+
+    const event: NostrEvent = {
+      kind: 3,
+      content: '', // Kind 3 content is typically empty
+      created_at: Math.floor(Date.now() / 1000),
+      tags,
+    };
+
+    // Sign the event
+    const signedEvent = await signEvent(event);
+
+    // Publish to relays
+    return await this.publishEvent(signedEvent);
+  }
 }
 
 // Export singleton instance

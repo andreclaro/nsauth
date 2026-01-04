@@ -188,6 +188,16 @@
   font-size: 0.875rem;
 }
 
+.error-message::selection {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.error-message::-moz-selection {
+  background: #dc2626;
+  color: #ffffff;
+}
+
 .error-message.small {
   font-size: 0.75rem;
   padding: 0.5rem;

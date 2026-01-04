@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '../../store/authStore';
-import { LoginButton } from '../auth/LoginButton';
 import { nosskeyService } from '../../services/nosskey.service';
 import './Layout.css';
 
@@ -38,6 +37,9 @@ export function Header() {
               <Link href="/graph" className="nav-link">
                 Graph
               </Link>
+              <Link href="/membership" className="nav-link">
+                Membership
+              </Link>
               <div className="user-info">
                 <span className="user-pubkey">
                   {publicKey ? `${publicKey.slice(0, 8)}...` : ''}
@@ -52,7 +54,6 @@ export function Header() {
               <Link href="/register" className="register-link">
                 Register
               </Link>
-              <LoginButton />
             </div>
           )}
         </nav>

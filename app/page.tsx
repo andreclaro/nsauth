@@ -25,15 +25,17 @@ export default function HomePage() {
     <div className="home-container">
       <div className="home-content">
         {/* ---------- Header ---------- */}
-        <h1>NS Auth</h1>
+        <h1>NS Auth</h1>
         <p className="home-subtitle">One credential, limitless access</p>
 
         {/* ---------- Integrated Description + Features ---------- */}
-        <p className="home-description">
-          With NS Auth you receive a single, portable credential that unlocks
-          both physical spaces and digital services across the entire community.
-          Because membership is verified through a cryptographically signed,
-          versioned member‑list, you enjoy:
+        <div className="home-description">
+          <p>
+            With NS Auth you receive a single, portable credential that unlocks
+            both physical spaces and digital services across the entire community.
+            Because membership is verified through a cryptographically signed,
+            versioned member‑list, you enjoy:
+          </p>
 
           {/* ---- Feature block – now part of the description ---- */}
           <div className="home-features">
@@ -65,7 +67,7 @@ export default function HomePage() {
               <p>
                 Zero‑knowledge proofs prove you belong to the community while
                 keeping personal identifiers (passport, national ID) completely
-                hidden from the service you’re accessing.
+                hidden from the service you're accessing.
               </p>
             </div>
 
@@ -82,10 +84,12 @@ export default function HomePage() {
           </div>
 
           {/* Closing sentence that ties back to the description */}
-          In short, NS Auth turns a collective reputation into a practical,
-          everyday trust layer that lets you work, learn, travel, and govern
-          with confidence and autonomy.
-        </p>
+          <p>
+            In short, NS Auth turns a collective reputation into a practical,
+            everyday trust layer that lets you work, learn, travel, and govern
+            with confidence and autonomy.
+          </p>
+        </div>
 
         {/* ---------- Call‑to‑Action Buttons ---------- */}
         <div className="home-actions">
@@ -100,4 +104,3 @@ export default function HomePage() {
     </div>
   );
 }
-
