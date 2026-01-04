@@ -58,9 +58,6 @@ export function Header() {
               <Link href="/profile" className="nav-link" onClick={handleNavClick}>
                 Profile
               </Link>
-              <Link href="/graph" className="nav-link" onClick={handleNavClick}>
-                Graph
-              </Link>
               <Link href="/membership" className="nav-link" onClick={handleNavClick}>
                 Membership
               </Link>

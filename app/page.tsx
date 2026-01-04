@@ -13,7 +13,7 @@ export default function HomePage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.replace('/graph');
+      router.replace('/');
     }
   }, [isAuthenticated, router]);
 
