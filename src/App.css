@@ -162,4 +162,154 @@ body {
   }
 }
 
+/* Docs Page Styles */
+.docs-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+  min-height: 70vh;
+}
+
+.docs-content {
+  color: #1a1a1a;
+}
+
+.docs-content h1 {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+  color: #1a1a1a;
+  letter-spacing: -0.02em;
+}
+
+.docs-intro {
+  font-size: 1.125rem;
+  color: #666;
+  line-height: 1.7;
+  margin: 0 0 3rem 0;
+}
+
+.protocol-section {
+  margin: 3rem 0;
+  padding: 2rem 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.protocol-section:last-child {
+  border-bottom: none;
+}
+
+.protocol-section h2 {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 1.875rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+  color: #1a1a1a;
+  letter-spacing: -0.01em;
+}
+
+.protocol-content {
+  line-height: 1.7;
+}
+
+.protocol-content h3 {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 1.5rem 0 0.75rem 0;
+  color: #1a1a1a;
+}
+
+.protocol-content p {
+  margin: 0 0 1rem 0;
+  color: #555;
+  font-size: 1rem;
+}
+
+.protocol-content ul,
+.protocol-content ol {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+  color: #555;
+}
+
+.protocol-content li {
+  margin: 0.5rem 0;
+  line-height: 1.6;
+}
+
+.protocol-content ul ul {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.protocol-content strong {
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.protocol-links {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 6px;
+  border-left: 3px solid #1a1a1a;
+}
+
+.protocol-links a {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.protocol-links a:hover {
+  text-decoration: underline;
+}
+
+.diagram-container {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  overflow-x: auto;
+}
+
+.architecture-diagram {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  display: block;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .docs-container {
+    padding: 1rem;
+  }
+
+  .docs-content h1 {
+    font-size: 2rem;
+  }
+
+  .protocol-section h2 {
+    font-size: 1.5rem;
+  }
+
+  .protocol-content h3 {
+    font-size: 1.125rem;
+  }
+
+  .diagram-container {
+    padding: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  .architecture-diagram {
+    min-width: 900px;
+  }
+}
+
 

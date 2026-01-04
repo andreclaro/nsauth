@@ -14,7 +14,7 @@ import './Profile.css';
 export function ProfilePage() {
   const router = useRouter();
   const publicKey = useAuthStore((state) => state.publicKey);
-  const { isVerified } = useVerification();
+  const { isVerified, getVerification } = useVerification();
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
@@ -59,6 +59,87 @@ export function ProfilePage() {
     }
   };
 
+  /**
+   * Extract passport data from verification proof
+   */
+  const getPassportData = (): { firstname?: string; lastname?: string } | null => {
+    // Check all verification types for passport data
+    const verificationTypes: Array<'age' | 'kyc' | 'personhood'> = ['age', 'kyc', 'personhood'];
+    
+    for (const type of verificationTypes) {
+      const proof = getVerification(type);
+      if (!proof || !proof.proofData) {
+        continue;
+      }
+
+      try {
+        const result = proof.proofData as Record<string, { disclose?: { result: string | number } }>;
+        const firstname = result.firstname?.disclose?.result;
+        const lastname = result.lastname?.disclose?.result;
+
+        if (firstname && lastname) {
+          return {
+            firstname: String(firstname).trim(),
+            lastname: String(lastname).trim(),
+          };
+        }
+      } catch (error) {
+        console.error('Failed to extract passport data:', error);
+      }
+    }
+
+    return null;
+  };
+
+  /**
+   * Normalize name for comparison (lowercase, trim, remove extra spaces)
+   */
+  const normalizeName = (name: string): string => {
+    return name.toLowerCase().trim().replace(/\s+/g, ' ');
+  };
+
+  /**
+   * Check if profile name matches passport data
+   */
+  const validateProfileAgainstPassport = (): { valid: boolean; error?: string } => {
+    const passportData = getPassportData();
+    
+    // Only validate if passport data is available
+    if (!passportData || !passportData.firstname || !passportData.lastname) {
+      return { valid: true }; // Allow submission if passport data is not available
+    }
+
+    const normalizedFirstname = normalizeName(passportData.firstname);
+    const normalizedLastname = normalizeName(passportData.lastname);
+    const passportFullName = normalizeName(`${passportData.firstname} ${passportData.lastname}`);
+    
+    // Get profile names (use display_name if name is empty, or vice versa)
+    const profileName = formData.name ? normalizeName(formData.name) : '';
+    const profileDisplayName = formData.display_name ? normalizeName(formData.display_name) : '';
+    const primaryProfileName = profileName || profileDisplayName;
+
+    if (!primaryProfileName) {
+      return {
+        valid: false,
+        error: 'Please enter a name or display name that matches your verified identity.',
+      };
+    }
+
+    // Check if profile name matches passport (allowing for reasonable variations)
+    const hasFirstname = primaryProfileName.includes(normalizedFirstname);
+    const hasLastname = primaryProfileName.includes(normalizedLastname);
+    const exactMatch = primaryProfileName === passportFullName;
+
+    if (!exactMatch && (!hasFirstname || !hasLastname)) {
+      return {
+        valid: false,
+        error: `Profile name must match your verified identity. Expected name containing: ${passportData.firstname} ${passportData.lastname}`,
+      };
+    }
+
+    return { valid: true };
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!publicKey) return;
@@ -67,6 +148,14 @@ export function ProfilePage() {
     setSaveMessage(null);
 
     try {
+      // Validate profile data against verified identity before submitting
+      const validation = validateProfileAgainstPassport();
+      if (!validation.valid) {
+        setSaveMessage(validation.error || 'Validation failed');
+        setIsSaving(false);
+        return;
+      }
+
       // Create Kind 0 event
       const event = {
         kind: 0,

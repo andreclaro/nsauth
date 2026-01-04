@@ -56,7 +56,7 @@ export default function HomePage() {
           <a href="/register" className="cta-button primary">
             Get Started
           </a>
-          <a href="/register" className="cta-button secondary">
+          <a href="/docs" className="cta-button secondary">
             Learn More
           </a>
         </div>

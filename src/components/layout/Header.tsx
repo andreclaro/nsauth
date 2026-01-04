@@ -27,6 +27,9 @@ export function Header() {
         </Link>
 
         <nav className="nav">
+          <Link href="/docs" className="nav-link">
+            Docs
+          </Link>
           {isAuthenticated ? (
             <>
               <Link href="/profile" className="nav-link">
