@@ -90,16 +90,6 @@ export default function HomePage() {
             with confidence and autonomy.
           </p>
         </div>
-
-        {/* ---------- Call‑to‑Action Buttons ---------- */}
-        <div className="home-actions">
-          <a href="/register" className="cta-button primary">
-            Get Started
-          </a>
-          <a href="/register" className="cta-button secondary">
-            Learn More
-          </a>
-        </div>
       </div>
     </div>
   );
