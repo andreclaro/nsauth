@@ -360,13 +360,13 @@ export function ProfilePage() {
             <button type="submit" className="save-button" disabled={isSaving}>
               {isSaving ? 'Saving...' : 'Save Profile'}
             </button>
-            <button
+            {/* <button
               type="button"
               className="cancel-button"
               onClick={() => router.push('/graph')}
             >
               Skip for Now
-            </button>
+            </button> */}
           </div>
         </form>
 
