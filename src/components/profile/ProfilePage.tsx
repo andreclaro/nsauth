@@ -219,13 +219,10 @@ export function ProfilePage() {
     <div className="profile-container">
       <div className="profile-card">
         <h1>Profile Setup</h1>
-        <p className="profile-description">
-          Set up your Nostr profile. This information will be published as a Kind 0 event.
-        </p>
 
         <form onSubmit={handleSubmit} className="profile-form">
           <div className="form-group">
-            <label htmlFor="name">Username</label>
+            <label htmlFor="name">Name (like in Passport)</label>
             <input
               type="text"
               id="name"
@@ -236,7 +233,7 @@ export function ProfilePage() {
             />
           </div>
 
-          <div className="form-group">
+          {/* <div className="form-group">
             <label htmlFor="display_name">Display Name</label>
             <input
               type="text"
@@ -246,7 +243,7 @@ export function ProfilePage() {
               onChange={handleChange}
               placeholder="Your display name"
             />
-          </div>
+          </div> */}
 
           <div className="form-group">
             <label htmlFor="about">About</label>

@@ -126,7 +126,7 @@ export function RegistrationFlow() {
       <div className="auth-card">
         <h1>Create Account</h1>
         <p className="auth-description">
-          Create a new account using WebAuthn passkey technology. Your Nostr identity will be securely derived from your passkey.
+          Create a new decentralized Identity. Your identity will be securely derived from a passkey.
         </p>
 
         {step === 'info' && (
