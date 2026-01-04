@@ -150,6 +150,64 @@ class RelayService {
   }
 
   /**
+   * Fetch role tag from profile event (Kind 0)
+   */
+  async fetchProfileRoleTag(pubkey: string): Promise<string | null> {
+    return new Promise((resolve) => {
+      const req = createRxBackwardReq();
+      let resolved = false;
+
+      const subscription = this.rxNostr
+        .use(req)
+        .pipe(
+          uniq(),
+          latest(),
+          completeOnTimeout(5000)
+        )
+        .subscribe({
+          next: (packet) => {
+            if (packet.event && packet.event.kind === 0 && !resolved) {
+              const tags = packet.event.tags || [];
+              for (const tag of tags) {
+                if (tag[0] === 'role' && tag[1]) {
+                  resolved = true;
+                  subscription.unsubscribe();
+                  resolve(tag[1]);
+                  return;
+                }
+              }
+              // No role tag found
+              resolved = true;
+              subscription.unsubscribe();
+              resolve(null);
+            }
+          },
+          complete: () => {
+            if (!resolved) {
+              resolved = true;
+              resolve(null);
+            }
+          },
+          error: (error) => {
+            console.error('Error fetching profile role tag:', error);
+            if (!resolved) {
+              resolved = true;
+              resolve(null);
+            }
+          },
+        });
+
+      req.emit([
+        {
+          kinds: [0],
+          authors: [pubkey],
+          limit: 1,
+        },
+      ]);
+    });
+  }
+
+  /**
    * Fetch a follow list (Kind 3 event)
    */
   async fetchFollowList(pubkey: string): Promise<FollowEntry[]> {
