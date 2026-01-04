@@ -199,7 +199,7 @@ export function MembershipPage() {
       <div className="membership-card">
         <h1>Membership Management</h1>
         <p className="membership-description">
-          Query profiles (kind 0) and manage your membership list (kind 3).
+          Query applicants and manage the membership list.
         </p>
 
         {saveMessage && (
