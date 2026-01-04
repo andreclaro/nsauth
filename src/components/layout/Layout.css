@@ -151,6 +151,20 @@
   border: none;
   cursor: pointer;
   padding: 0;
+  outline: none;                /* removes the outline */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Ensure the same for keyboard focus (optional – keep accessibility in mind) */
+.hamburger:focus,
+.hamburger:focus-visible {
+  outline: none;
+}
+
+/* Remove any default active/hover background that may create the circle */
+.hamburger:hover,
+.hamburger:active {
+  background: transparent;     /* keep the button truly transparent */
 }
 .hamburger span {
   display: block;
