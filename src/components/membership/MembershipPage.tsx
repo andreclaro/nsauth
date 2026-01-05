@@ -27,7 +27,10 @@ export const BarcodeScanner = ({ onDecode, active = true }: Props) => {
       // `result.getText()` gives the raw string from the QR/barcode
       onDecode(result.getText());
     },
-    onError: (e) => setError(e?.message ?? 'Camera error'),
+    onError: (e: unknown) => {
+      const errorMessage = e instanceof Error ? e.message : 'Camera error';
+      setError(errorMessage);
+    },
   });
 
   // Hide the video element when the scanner isn’t active

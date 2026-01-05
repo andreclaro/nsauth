@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+interface GeminiModel {
+  name?: string;
+  supportedGenerationMethods?: string[];
+}
+
 const ROLES = [
   // Government & Public Service
   'Executive Leader / President',
@@ -76,11 +81,12 @@ export async function POST(request: NextRequest) {
         const listModelsUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
         const modelsResponse = await fetch(listModelsUrl);
         if (modelsResponse.ok) {
-          const modelsData = await modelsResponse.json();
+          const modelsData = await modelsResponse.json() as { models?: GeminiModel[] };
           if (modelsData.models) {
             availableModels = modelsData.models
-              .filter((m: any) => m.supportedGenerationMethods?.includes('generateContent'))
-              .map((m: any) => m.name?.replace('models/', '') || m.name);
+              .filter((m: GeminiModel) => m.supportedGenerationMethods?.includes('generateContent'))
+              .map((m: GeminiModel) => m.name?.replace('models/', '') || m.name)
+              .filter((name): name is string => name !== undefined);
             console.log('Available Gemini models:', availableModels);
           }
         }
