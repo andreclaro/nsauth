@@ -240,6 +240,7 @@ export function ProfilePage() {
       );
     } finally {
       setIsSaving(false);
+      router.push('/membership')
     }
   };
 
@@ -306,7 +307,7 @@ export function ProfilePage() {
             />
           </div>
 
-          {/* <div className="form-group">
+          <div className="form-group">
             <label htmlFor="picture">Profile Picture URL</label>
             <input
               type="url"
@@ -316,7 +317,7 @@ export function ProfilePage() {
               onChange={handleChange}
               placeholder="https://example.com/avatar.jpg"
             />
-          </div> */}
+          </div>
 
           {/* <div className="form-group">
             <label htmlFor="website">Website</label>
