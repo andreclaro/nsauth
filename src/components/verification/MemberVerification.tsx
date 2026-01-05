@@ -175,7 +175,7 @@ export function MemberVerification() {
     <div className="verification-card">
       <h3>Member Verification</h3>
       <p className="verification-description">
-        Verify that you are over 18 years old and by confirming your name matches your passport.
+        Verify your humanity, that you are over 18 years old, and your government identity by confirming your name matches your passport.
       </p>
 
       {error && <div className="error-message">{error}</div>}
