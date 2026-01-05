@@ -166,7 +166,7 @@ export function MemberVerification() {
     return (
       <div className="verification-status verified">
         <span className="status-icon">✓</span>
-        <span className="status-text">Member verified (18+ and KYC)</span>
+        <span className="status-text">Member verified (18+ and passport name matches)</span>
       </div>
     );
   }
@@ -175,7 +175,7 @@ export function MemberVerification() {
     <div className="verification-card">
       <h3>Member Verification</h3>
       <p className="verification-description">
-        Verify your humanity, that you are over 18 years old, and your government identity by confirming your name matches your passport.
+        Verify your humanity, that you are over 18 years old, and confirm your name matches your passport.
       </p>
 
       {error && <div className="error-message">{error}</div>}
