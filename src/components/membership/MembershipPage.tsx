@@ -39,7 +39,7 @@ export const BarcodeScanner = ({ onDecode, active = true }: Props) => {
   return (
     <div style={{ position: 'relative', width: '100%', maxWidth: '400px' }}>
       <video
-        ref={ref}
+        ref={ref as React.LegacyRef<HTMLVideoElement>}
         style={{ width: '100%', borderRadius: '8px' }}
         playsInline
         muted

@@ -5,6 +5,24 @@ interface GeminiModel {
   supportedGenerationMethods?: string[];
 }
 
+interface GeminiContentPart {
+  text?: string;
+}
+
+interface GeminiContent {
+  parts?: GeminiContentPart[];
+}
+
+interface GeminiCandidate {
+  content?: GeminiContent;
+  text?: string;
+  output?: string;
+}
+
+interface GeminiResponse {
+  candidates?: GeminiCandidate[];
+}
+
 const ROLES = [
   // Government & Public Service
   'Executive Leader / President',
@@ -184,14 +202,16 @@ Return only the exact category name:`;
           continue; // Try next model/version
         }
 
-        const data = await response.json();
+        const data = await response.json() as GeminiResponse;
         
         // Log full response structure for debugging
         console.log(`Gemini API full response (${config.version}/${config.model}):`, JSON.stringify(data, null, 2));
         
         // Extract the suggested role from the response
-        if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-          const text = data.candidates[0].content.parts[0]?.text || '';
+        const firstCandidate = data.candidates?.[0];
+        const content = firstCandidate?.content;
+        if (content?.parts && content.parts[0]) {
+          const text = content.parts[0].text || '';
           const trimmedText = text.trim();
           lastGeminiResponse = trimmedText;
           
