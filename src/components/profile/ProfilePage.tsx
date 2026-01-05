@@ -8,7 +8,7 @@ import { geminiService } from '../../services/gemini.service';
 import { useAuthStore } from '../../store/authStore';
 import { useVerification } from '../../hooks/useVerification';
 import { VerificationFlow } from '../verification/VerificationFlow';
-import { VerificationBadge } from '../verification/VerificationBadge';
+// import { VerificationBadge } from '../verification/VerificationBadge';
 import type { ProfileMetadata } from '../../types/nostr';
 import './Profile.css';
 
@@ -356,6 +356,27 @@ export function ProfilePage() {
               ) : null}
             </div>
           )}
+          
+          {!showVerification ? (
+            <button
+              className="verification-toggle-button"
+              onClick={() => setShowVerification(true)}
+            >
+              {isVerified('age') || isVerified('kyc')
+                ? 'Manage Verifications'
+                : 'Verify Identity'}
+            </button>
+          ) : (
+            <>
+              <button
+                className="verification-toggle-button"
+                onClick={() => setShowVerification(false)}
+              >
+                Hide Verification
+              </button>
+              <VerificationFlow />
+            </>
+          )}
 
           <div className="form-actions">
             <button type="submit" className="save-button" disabled={isSaving}>
@@ -372,7 +393,7 @@ export function ProfilePage() {
         </form>
 
         {/* Verification Section */}
-        <div className="verification-section">
+        {/* <div className="verification-section">
           <div className="verification-header-section">
             <h2>Identity Verification</h2>
             <div className="verification-badges">
@@ -401,7 +422,7 @@ export function ProfilePage() {
               <VerificationFlow />
             </>
           )}
-        </div>
+        </div> */}
       </div>
     </div>
   );
