@@ -73,7 +73,7 @@ export function Header() {
     <header className="header">
       <div className="header-content">
         {/* Logo */}
-        <Link href="/docs" className="logo">
+        <Link href="/" className="logo">
           <img
             src="/network-state-plus-flag-logo.png"
             alt="Network School"

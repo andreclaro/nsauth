@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from './components/layout/Layout';
 import { RegistrationFlow } from './components/auth/RegistrationFlow';
 import { ProfilePage } from './components/profile/ProfilePage';
-import { RelationshipGraph } from './components/graph/RelationshipGraph';
+import { MembershipPage } from './components/membership/MembershipPage'
 import { VerifyOnlyDemo } from './components/verification/VerifyOnlyDemo';
 import { useAuthStore } from './store/authStore';
 import { useAuthInit } from './hooks/useAuth';
@@ -110,10 +110,10 @@ function App() {
             }
           />
           <Route
-            path="/graph"
+            path="/membership"
             element={
               <ProtectedRoute>
-                <RelationshipGraph />
+                <MembershipPage />
               </ProtectedRoute>
             }
           />
