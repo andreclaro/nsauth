@@ -53,6 +53,28 @@ export const BarcodeScanner = ({ onDecode, active = true }: Props) => {
   );
 };
 
+const TrustInfo = () => (
+  <section className="trust-info">
+    <h2>Building Trust with Verifiable Relationship Credentials</h2>
+    <p>
+      Beyond the Personhood Credential, members can create <strong>Verifiable Relationship
+      Credentials (VRCs)</strong>.  A VRC is issued directly between two members – for example,
+      by scanning a QR‑code at a meetup – and certifies a first‑hand trust link.
+    </p>
+    <p>
+      Each VRC becomes a node in a decentralized trust graph.  When you add a member, the
+      system records a <strong>role</strong> tag that ties the new
+      participant to your existing graph, enabling permissionless access to network‑state
+      resources while keeping the underlying data private.
+    </p>
+    <p>
+      The graph grows organically: trusted authorities issue PHCs, and members continuously
+      enrich the network with peer‑generated VRCs, creating a resilient, scalable web of
+      verified participants.
+    </p>
+  </section>
+);
+
 export function MembershipPage() {
   const router = useRouter();
   const publicKey = useAuthStore((state) => state.publicKey);
@@ -250,6 +272,7 @@ export function MembershipPage() {
     <div className="membership-container">
       <div className="membership-card">
         <h1>Membership Management</h1>
+        <TrustInfo />
         <p className="membership-description">
           Query applicants and manage the membership list.
         </p>

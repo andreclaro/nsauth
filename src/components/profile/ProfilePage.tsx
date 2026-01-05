@@ -12,6 +12,21 @@ import { VerificationFlow } from '../verification/VerificationFlow';
 import type { ProfileMetadata } from '../../types/nostr';
 import './Profile.css';
 
+const PersonhoodInfo = () => (
+    <section className="personhood-info">
+      <p>
+        Network‑state members receive a <strong>Personhood Credential (PHC)</strong> from a trusted authority.
+        The PHC attests that the holder is a unique, real individual. Because the credential lives
+        in your passport, you can present a <em>zero‑knowledge proof</em> that you are verified.
+      </p>
+      <p>
+        In this form we compare the name you enter with the name disclosed by your verified
+        passport proof. If the two match, the profile will be saved as your business card credential together with a
+        passport tag that references the PHC’s unique identifier.
+      </p>
+    </section>
+  );
+
 export function ProfilePage() {
   const router = useRouter();
   const publicKey = useAuthStore((state) => state.publicKey);
@@ -269,10 +284,11 @@ export function ProfilePage() {
     <div className="profile-container">
       <div className="profile-card">
         <h1>Profile Setup</h1>
+        <PersonhoodInfo />
 
         <form onSubmit={handleSubmit} className="profile-form">
           <div className="form-group">
-            <label htmlFor="name">Name (like in Passport)</label>
+            <label htmlFor="name">First Name</label>
             <input
               type="text"
               id="name"
@@ -283,17 +299,17 @@ export function ProfilePage() {
             />
           </div>
 
-          {/* <div className="form-group">
-            <label htmlFor="display_name">Display Name</label>
+          <div className="form-group">
+            <label htmlFor="display_name">Last Name</label>
             <input
               type="text"
               id="display_name"
               name="display_name"
               value={formData.display_name || ''}
               onChange={handleChange}
-              placeholder="Your display name"
+              placeholder="Your Last Name"
             />
-          </div> */}
+          </div>
 
           <div className="form-group">
             <label htmlFor="about">About</label>
@@ -319,17 +335,17 @@ export function ProfilePage() {
             />
           </div>
 
-          {/* <div className="form-group">
-            <label htmlFor="website">Website</label>
+          <div className="form-group">
+            <label htmlFor="website">LinkedIn</label>
             <input
               type="url"
               id="website"
               name="website"
               value={formData.website || ''}
               onChange={handleChange}
-              placeholder="https://example.com"
+              placeholder="https://linkedin.com/example"
             />
-          </div> */}
+          </div>
 
           {saveMessage && (
             <div className={`save-message ${saveMessage.includes('Error') ? 'error' : 'success'}`}>
