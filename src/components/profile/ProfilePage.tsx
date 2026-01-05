@@ -217,7 +217,7 @@ export function ProfilePage() {
         kind: 3,
         content: "",
         created_at: Math.floor(Date.now() / 1000),
-        tags: [["p", publicKey, "wss://relay.damus.io", formData.name]],
+        tags: [["p", publicKey, "wss://relay.damus.io", formData.name || ""]],
       };
 
       // Sign event
