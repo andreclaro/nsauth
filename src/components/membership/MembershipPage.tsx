@@ -6,11 +6,49 @@ import { nosskeyService } from '../../services/nosskey.service';
 import { relayService } from '../../services/relay.service';
 import { useAuthStore } from '../../store/authStore';
 import type { ProfileMetadata, FollowEntry } from '../../types/nostr';
+import { useZxing } from 'react-zxing';
 import './Membership.css';
 
 interface ProfileWithPubkey extends ProfileMetadata {
   pubkey: string;
 }
+
+type Props = {
+  /** Called when a code is successfully read */
+  onDecode: (value: string) => void;
+  /** Optional flag to hide the scanner */
+  active?: boolean;
+};
+
+export const BarcodeScanner = ({ onDecode, active = true }: Props) => {
+  const [error, setError] = useState<string | null>(null);
+  const { ref } = useZxing({
+    onDecodeResult: (result) => {
+      // `result.getText()` gives the raw string from the QR/barcode
+      onDecode(result.getText());
+    },
+    onError: (e) => setError(e?.message ?? 'Camera error'),
+  });
+
+  // Hide the video element when the scanner isn’t active
+  if (!active) return null;
+
+  return (
+    <div style={{ position: 'relative', width: '100%', maxWidth: '400px' }}>
+      <video
+        ref={ref}
+        style={{ width: '100%', borderRadius: '8px' }}
+        playsInline
+        muted
+      />
+      {error && (
+        <p style={{ color: 'red', marginTop: '0.5rem' }}>
+          {error}
+        </p>
+      )}
+    </div>
+  );
+};
 
 export function MembershipPage() {
   const router = useRouter();
@@ -22,6 +60,7 @@ export function MembershipPage() {
   const [profiles, setProfiles] = useState<ProfileWithPubkey[]>([]);
   const [members, setMembers] = useState<FollowEntry[]>([]);
   const [memberProfiles, setMemberProfiles] = useState<Map<string, ProfileMetadata>>(new Map());
+  const [showScanner, setShowScanner] = useState(false);
 
   useEffect(() => {
     if (!publicKey) {
@@ -39,6 +78,16 @@ export function MembershipPage() {
       loadMemberProfiles();
     }
   }, [members]);
+
+  const handleDecoded = (decoded: string) => {
+    // Fill the input field
+    setSearchQuery(decoded);
+    // Optionally close the scanner UI
+    setShowScanner(false);
+    // Immediately run the same search logic you already have
+    // (you can also wait for the user to press “Search” if you prefer)
+    handleSearch(); 
+  };
 
   const loadFollowList = async () => {
     if (!publicKey) return;
@@ -216,14 +265,14 @@ export function MembershipPage() {
 
         {/* Search Section */}
         <div className="search-section">
-          <h2>Search Profiles</h2>
+          <h2>Add Member</h2>
           <div className="search-form">
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-              placeholder="Enter pubkey (64 hex chars) or leave empty for recent profiles"
+              placeholder="Enter pubkey or leave empty for recent profiles"
               className="search-input"
               disabled={isLoading}
             />
@@ -234,7 +283,24 @@ export function MembershipPage() {
             >
               {isLoading ? 'Searching...' : 'Search'}
             </button>
+            <button
+              onClick={() => setShowScanner((prev) => !prev)}
+              className="scanner-toggle"
+              disabled={isLoading || isSaving}
+            >
+              {showScanner ? 'Close Scanner' : 'Scan QR'}
+            </button>
           </div>
+
+          {/* Show the scanner only when the user asked for it */}
+          {showScanner && (
+            <div style={{ marginTop: '1rem' }}>
+              <BarcodeScanner onDecode={handleDecoded} active={true} />
+              <p style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>
+                Point at QR‑code containing a pubkey
+              </p>
+            </div>
+          )}
 
           {/* Search Results */}
           {profiles.length > 0 && (

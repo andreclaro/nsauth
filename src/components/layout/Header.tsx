@@ -5,7 +5,8 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useAuthStore } from '../../store/authStore';
 import { nosskeyService } from '../../services/nosskey.service';
 import './Layout.css';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { QRCodeSVG } from 'qrcode.react';   // <-- import directly
 
 export function Header() {
   const router = useRouter();
@@ -15,13 +16,38 @@ export function Header() {
   const logout = useAuthStore((s) => s.logout);
   const setAuthenticated = useAuthStore((s) => s.setAuthenticated);
   const setLoginError = useAuthStore((s) => s.setLoginError);
-
+  const [showQr, setShowQr] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [hasAccount, setHasAccount] = useState(false);
   const [isLoginLoading, setIsLoginLoading] = useState(false);
 
-  // Check if user has an account (key info stored)
-  // Update when pathname changes so it reflects after registration
+  // Ref to the button that opens the QR panel – used for click‑outside detection
+  const qrButtonRef = useRef<HTMLButtonElement>(null);
+  const qrPanelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowQr(false);
+    };
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as Node;
+      // If the click is NOT inside the button OR the panel, close it
+      if (
+        qrButtonRef.current?.contains(target) ||
+        qrPanelRef.current?.contains(target)
+      ) {
+        return;
+      }
+      setShowQr(false);
+    };
+    window.addEventListener('keydown', handleKey);
+    window.addEventListener('mousedown', handleClick);
+    return () => {
+      window.removeEventListener('keydown', handleKey);
+      window.removeEventListener('mousedown', handleClick);
+    };
+  }, []);
+
   useEffect(() => {
     setHasAccount(nosskeyService.hasKeyInfo());
   }, [pathname]);
@@ -36,43 +62,28 @@ export function Header() {
   const handleLogin = async () => {
     setIsLoginLoading(true);
     setLoginError(null);
-    setMenuOpen(false); // Close mobile menu
-
+    setMenuOpen(false);
     try {
-      // Check if key info exists
-      if (!nosskeyService.hasKeyInfo()) {
+      if (!nosskeyService.hasKeyInfo())
         throw new Error('No account found. Please register first.');
-      }
 
-      // Get current key info
       const keyInfo = nosskeyService.getCurrentKeyInfo();
-      if (!keyInfo) {
-        throw new Error('Failed to load account information.');
-      }
+      if (!keyInfo) throw new Error('Failed to load account information.');
 
-      // Verify by getting public key (this will trigger WebAuthn authentication)
-      await nosskeyService.getPublicKey();
-
-      // Set as authenticated
+      await nosskeyService.getPublicKey(); // triggers WebAuthn
       setAuthenticated(keyInfo);
-
-      // Redirect to docs page
       router.push('/');
     } catch (err) {
-      console.error('Login error:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to login';
-      setLoginError(errorMessage);
+      const msg = err instanceof Error ? err.message : 'Failed to login';
+      setLoginError(msg);
       setIsLoginLoading(false);
     }
   };
 
-  // close the mobile menu when a link is clicked
-  const handleNavClick = () => setMenuOpen(false);
-
   return (
-    <header className="header">
+    <header className="header" style={{ position: 'relative' }}>
       <div className="header-content">
-        {/* Logo */}
+        {/* LOGO */}
         <Link href="/" className="logo">
           <img
             src="/network-state-plus-flag-logo.png"
@@ -81,7 +92,7 @@ export function Header() {
           />
         </Link>
 
-        {/* Hamburger – only visible on small screens */}
+        {/* HAMBURGER (mobile) */}
         <button
           className={`hamburger ${menuOpen ? 'open' : ''}`}
           aria-label="Toggle navigation"
@@ -92,25 +103,60 @@ export function Header() {
           <span />
         </button>
 
-        {/* Navigation – the “mobile‑open” class is added when the menu is open */}
+        {/* NAVIGATION */}
         <nav className={`nav ${menuOpen ? 'mobile-open' : ''}`}>
-          <Link href="/docs" className="nav-link" onClick={handleNavClick}>
+          <Link href="/docs" className="nav-link" onClick={() => setMenuOpen(false)}>
             Docs
           </Link>
 
           {isAuthenticated ? (
             <>
-              <Link href="/profile" className="nav-link" onClick={handleNavClick}>
+              <Link href="/profile" className="nav-link" onClick={() => setMenuOpen(false)}>
                 Profile
               </Link>
-              <Link href="/membership" className="nav-link" onClick={handleNavClick}>
+              <Link href="/membership" className="nav-link" onClick={() => setMenuOpen(false)}>
                 Membership
               </Link>
 
-              <div className="user-info">
-                <span className="user-pubkey">
-                  {publicKey ? `${publicKey.slice(0, 8)}…` : ''}
-                </span>
+              <div className="user-info" style={{ position: 'relative' }}>
+                {/* PUBLIC‑KEY BUTTON – opens the inline QR panel */}
+                <button
+                  ref={qrButtonRef}
+                  className="user-pubkey btn-pubkey"
+                  onClick={() => setShowQr((prev) => !prev)}
+                  title="Show QR code for your public key"
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    padding: 0,
+                    margin: 0,
+                    cursor: 'pointer',
+                    color: 'inherit',
+                    fontFamily: 'inherit',
+                  }}
+                >
+                  {publicKey ? `${publicKey.slice(0, 12)}…` : ''}
+                </button>
+
+                {/* INLINE QR PANEL (visible only when showQr===true) */}
+                {showQr && publicKey && (
+                  <div
+                    ref={qrPanelRef}
+                    className="qr-panel"
+                    role="dialog"
+                    aria-modal="true"
+                  >
+                    <QRCodeSVG
+                      value={publicKey}
+                      size={180}
+                      level="M"
+                      includeMargin={true}
+                      bgColor="#ffffff"
+                      fgColor="#000000"
+                    />
+                  </div>
+                )}
+
                 <button onClick={handleLogout} className="logout-button">
                   Logout
                 </button>
@@ -127,7 +173,7 @@ export function Header() {
                   {isLoginLoading ? 'Logging in...' : 'Login'}
                 </button>
               ) : (
-                <Link href="/register" className="register-link" onClick={handleNavClick}>
+                <Link href="/register" className="register-link" onClick={() => setMenuOpen(false)}>
                   Register
                 </Link>
               )}

@@ -34,6 +34,132 @@
 }
 
 /* --------------------------------------------------------------
+   Header – make sure the root header is the positioning context
+-------------------------------------------------------------- */
+header.header {
+  position: relative;           /* ensures absolute children are scoped here */
+}
+
+/* --------------------------------------------------------------
+   QR‑panel – desktop unchanged, mobile tweaks
+-------------------------------------------------------------- */
+.qr-panel {
+  /* Desktop defaults – unchanged */
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  padding: 1rem;
+  background: var(--bg-color, #fff);
+  border: 1px solid rgba(0, 0, 0, .15);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .1);
+  z-index: 10;
+  width: max-content;
+}
+
+/* Mobile overrides – the only part you need to add/replace */
+@media (max-width: 768px) {
+  /* 1️⃣ Make the surrounding .user‑info the positioning anchor */
+  .user-info {
+    position: relative;          /* NEW – gives the panel a proper reference */
+  }
+
+  .qr-panel {
+    left: 0;                     /* stretch to the left edge of .user‑info */
+    right: 0;                    /* and to the right edge */
+    width: auto;                 /* fill the container */
+    margin: 0 0.5rem;            /* keep a little horizontal breathing room */
+    top: calc(100% + 0.6rem);    /* a tad more space below the pubkey button */
+    max-height: 70vh;            /* keep it from taking the whole screen */
+    overflow-y: auto;            /* scroll if content exceeds max‑height */
+    padding: 1.2rem;             /* keep the original padding */
+  }
+
+  /* 2️⃣ Arrow stays centred on mobile */
+  .qr-panel::before {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    top: -8px;
+    border-width: 0 8px 8px 8px;
+  }
+}
+
+/* --------------------------------------------------------------
+   User‑info – mobile layout (already column) – just ensure spacing
+-------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .qr-panel {
+    /* Switch from tooltip‑style to a regular block */
+    position: static;               /* remove absolute positioning */
+    top: auto;
+    right: auto;
+    left: auto;
+    margin: 0.5rem 0;               /* space from the pubkey button */
+    width: 100%;                    /* fill the column width */
+    max-width: 260px;               /* keep the QR image readable */
+    align-self: flex-start;         /* align with the left edge of the column */
+    padding: 1rem;                  /* keep the same inner padding */
+    box-sizing: border-box;         /* ensure padding doesn’t overflow */
+    /* Keep the same visual style (border, shadow, radius) */
+    background: var(--bg-color, #fff);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .1);
+    z-index: 10;
+  }
+
+  /* Hide the arrow that was designed for the desktop tooltip */
+  .qr-panel::before {
+    display: none;
+  }
+}
+
+/* --------------------------------------------------------------
+   Mobile‑first overrides (≤ 768 px) – keep existing rules
+-------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .header { padding: 0 1rem; }
+  .header-content { height: 56px; }
+
+  .hamburger { display: flex; }
+
+  .nav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: rgba(255,255,255,0.97);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+    z-index: 99;
+  }
+
+  .nav.mobile-open { max-height: 500px; padding: 0.75rem 0; }
+
+  .nav-link,
+  .register-link,
+  .login-link,
+  .logout-button {
+    padding: 0.75rem 1.5rem;
+    width: 100%;
+    text-align: left;
+  }
+
+  .auth-buttons,
+  .user-info {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.5rem 1.5rem;
+  }
+
+  .user-pubkey { margin-bottom: 0.5rem; }
+}
+
+/* --------------------------------------------------------------
    Logo
 -------------------------------------------------------------- */
 .logo {
@@ -183,54 +309,71 @@
    Mobile‑first overrides (≤ 768 px)
 -------------------------------------------------------------- */
 @media (max-width: 768px) {
-  .header { padding: 0 1rem; }
-  .header-content { height: 56px; }
+  /* More specific selector to outrank earlier rules */
+  header .header-content .user-info .qr-panel,
+  .header .header-content .user-info .qr-panel {
+    /* Reset visual chrome */
+    border: none !important;
+    box-shadow: none !important;
 
-  /* Show hamburger */
-  .hamburger { display: flex; }
+    /* Keep the rest of the mobile layout (padding, width, etc.) */
+    position: static !important;
+    margin: 0.5rem 0 !important;
+    width: 100% !important;
+    max-width: 260px !important;
+    align-self: flex-start !important;
+    padding: 1rem !important;
+    background: var(--bg-color, #fff) !important;
+    border-radius: 8px !important;   /* keep rounded corners if you like */
+    z-index: 10 !important;
+  }
 
-  /* Hide nav by default, show when menuOpen */
-  .nav {
-    position: absolute;
-    top: 100%;                 /* just below the header */
-    left: 0;
-    right: 0;
-    background: rgba(255,255,255,0.97);
+  /* Hide the arrow that was previously used for the desktop tooltip */
+  header .header-content .user-info .qr-panel::before,
+  .header .header-content .user-info .qr-panel::before {
+    display: none !important;
+  }
+
+  /* Show the button on mobile */
+  .hamburger {
+    display: flex;               /* <-- key line */
     flex-direction: column;
-    align-items: stretch;
-    gap: 0;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.35s ease;
-    border-bottom: 1px solid #e5e7eb;
-    z-index: 99;
+    justify-content: space-between;
+    width: 24px;
+    height: 18px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
   }
 
-  /* When the menu is opened */
-  .nav.mobile-open {
-    max-height: 500px;         /* enough for all items; you could use 100vh */
-    padding: 0.75rem 0;
+  /* Keep the focus style (optional, improves accessibility) */
+  .hamburger:focus,
+  .hamburger:focus-visible {
+    outline: none;
   }
 
-  .nav-link,
-  .register-link,
-  .login-link,
-  .logout-button {
-    padding: 0.75rem 1.5rem;
-    width: 100%;
-    text-align: left;
+  /* Remove any accidental background that could appear on tap */
+  .hamburger:hover,
+  .hamburger:active {
+    background: transparent;
   }
 
-  .auth-buttons,
-  .user-info {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 0.5rem 1.5rem;
+  /* The three bars that form the icon */
+  .hamburger span {
+    display: block;
+    height: 2px;
+    background: #374151;
+    border-radius: 1px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
   }
 
-  .user-pubkey {
-    margin-bottom: 0.5rem;
-  }
+  /* Animation when the menu is open (kept unchanged) */
+  .hamburger.open span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
 }
 
 /* --------------------------------------------------------------
