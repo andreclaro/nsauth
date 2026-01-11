@@ -267,58 +267,164 @@ class RelayService {
     });
   }
 
-  /**
-   * Fetch multiple profiles in batch
-   */
-  async fetchMultipleProfiles(pubkeys: string[]): Promise<Map<string, ProfileMetadata>> {
-    if (pubkeys.length === 0) {
-      return new Map();
-    }
-
+  async fetchFollowers(pubkey: string): Promise<FollowEntry[]> {
     return new Promise((resolve) => {
       const req = createRxBackwardReq();
-      const profiles = new Map<string, ProfileMetadata>();
       let resolved = false;
 
-      this.rxNostr
+      const subscription = this.rxNostr
         .use(req)
         .pipe(
           uniq(),
-          completeOnTimeout(1000)
+          latest(),
+          completeOnTimeout(10_000) // same timeout we use for follows
         )
         .subscribe({
           next: (packet) => {
-            if (packet.event && packet.event.kind === 0 && packet.event.pubkey) {
-              try {
-                const metadata = JSON.parse(packet.event.content) as ProfileMetadata;
-                profiles.set(packet.event.pubkey, metadata);
-              } catch (error) {
-                console.error('Failed to parse profile metadata:', error);
+            // We only care about KIND‑3 events that *mention* the target pubkey
+            if (packet.event && packet.event.kind === 3 && !resolved) {
+              const followers: FollowEntry[] = [];
+              const tags = packet.event.tags || [];
+
+              // Each “p” tag is a followed pubkey.  If the tag value equals the
+              // target, the *author* of the event is a follower.
+              if (packet.event.pubkey) {
+                // The author of the KIND‑3 event is the follower.
+                const followerPubkey = packet.event.pubkey;
+
+                for (const tag of tags) {
+                  if (tag[0] === 'p' && tag[1] === pubkey) {
+                    followers.push({
+                      pubkey: followerPubkey,
+                      relay: tag[2] || undefined,
+                      petname: tag[3] || undefined,
+                    });
+                    // One “p” tag per follower is enough – break to avoid dupes
+                    break;
+                  }
+                }
               }
+
+              // Resolve after processing the first matching event (there may be
+              // several events from different relays, but `latest()` already
+              // gave us the newest one).
+              resolved = true;
+              subscription.unsubscribe();
+              resolve(followers);
             }
           },
           complete: () => {
             if (!resolved) {
               resolved = true;
-              resolve(profiles);
+              resolve([]); // no follower event seen
             }
           },
           error: (error) => {
-            console.error('Error fetching profiles:', error);
+            console.error('Error fetching followers:', error);
             if (!resolved) {
               resolved = true;
+              resolve([]);
+            }
+          },
+        });
+
+      // NOTE: the filter uses “#p” to match a tag value.
+      req.emit([
+        {
+          kinds: [3],
+          '#p': [pubkey], // ← NEW – look for KIND‑3 events that contain this pubkey
+          limit: 1,
+        },
+      ]);
+    });
+  }
+
+  /**
+   * Fetch multiple profiles in batch
+   */
+  async fetchMultipleProfiles(
+    pubkeys: string[],
+    timeoutMs = 8000
+  ): Promise<Map<string, ProfileMetadata>> {
+    // Fast‑path – nothing to fetch
+    if (pubkeys.length === 0) {
+      return new Map();
+    }
+
+    return new Promise<Map<string, ProfileMetadata>>((resolve) => {
+      const req = createRxBackwardReq();
+      const profiles = new Map<string, ProfileMetadata>();
+      let resolved = false;
+
+      // Subscribe **once** – do NOT call .unsubscribe() immediately!
+      const subscription = this.rxNostr
+        .use(req)
+        .pipe(
+          // Remove duplicate events (same pubkey/kind)
+          uniq(),
+          // Emit `complete` if no event arrives within `timeoutMs`
+          completeOnTimeout(timeoutMs)
+        )
+        .subscribe({
+          next: (packet) => {
+            // We only care about Kind‑0 (profile) events that contain a pubkey
+            if (packet.event && packet.event.kind === 0 && packet.event.pubkey) {
+              try {
+                const meta = JSON.parse(packet.event.content) as ProfileMetadata;
+                profiles.set(packet.event.pubkey, meta);
+              } catch (e) {
+                console.error(
+                  `Failed to parse profile metadata for ${packet.event.pubkey}:`,
+                  e
+                );
+              }
+            }
+          },
+
+          // The observable signals that it’s done (either because the timeout
+          // fired or the relay sent a `EOSE`/`CLOSE` frame).  Resolve the promise.
+          complete: () => {
+            if (!resolved) {
+              resolved = true;
+              console.info(
+                `✅ fetchMultipleProfiles completed – ${profiles.size}/${pubkeys.length} profiles retrieved`
+              );
+              subscription.unsubscribe(); // clean up
               resolve(profiles);
             }
           },
-        })
-        .unsubscribe();
 
+          error: (err) => {
+            if (!resolved) {
+              resolved = true;
+              console.error('❌ fetchMultipleProfiles error:', err);
+              subscription.unsubscribe();
+              // Still resolve with whatever we managed to collect (could be empty)
+              resolve(profiles);
+            }
+          },
+        });
+
+      // Emit the request to the relays
       req.emit([
         {
           kinds: [0],
           authors: pubkeys,
         },
       ]);
+
+      // Safety net – in the unlikely event the observable never completes
+      // (e.g., a buggy relay), enforce our own hard timeout.
+      setTimeout(() => {
+        if (!resolved) {
+          resolved = true;
+          console.warn(
+            `⚠️ fetchMultipleProfiles hard timeout (${timeoutMs} ms) – returning ${profiles.size} profiles`
+          );
+          subscription.unsubscribe();
+          resolve(profiles);
+        }
+      }, timeoutMs + 2000); // a little buffer beyond the Rx timeout
     });
   }
 

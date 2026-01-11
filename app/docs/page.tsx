@@ -3,23 +3,23 @@
 import '@/App.css';
 
 /* --------------------------------------------------------------
-   NS Auth – User‑Focused Documentation
+   NSAuth – User‑Focused Documentation
    -------------------------------------------------------------- */
 export default function DocsPage() {
   return (
     <div className="docs-container">
       <div className="docs-content">
-        <h1>NS Auth Overview</h1>
+        <h1>NSAuth Overview</h1>
 
         <p className="docs-intro">
-          NS Auth gives you a single, portable credential that works everywhere – from gyms and co‑working spaces
+          NSAuth gives you a single, portable credential that works everywhere – from gyms and co‑working spaces
           to online courses, travel services, and community voting. By tying every interaction to a trusted,
           versioned member list, you enjoy seamless access, instant policy updates, and strong privacy protection.
         </p>
 
         {/* ==================== USER BENEFITS ==================== */}
         <section className="protocol-section">
-          <h2>Why NS Auth Is Valuable for You</h2>
+          <h2>Why NSAuth Is Valuable for You</h2>
           <div className="protocol-content">
             <ul>
               <li>
@@ -183,15 +183,16 @@ export default function DocsPage() {
                 xmlns="http://www.w3.org/2000/svg"
               >
                 {/* User */}
-                <rect x="50" y="50" width="120" height="80" rx="8" fill="#e0f2fe" stroke="#0284c7" strokeWidth="2" />
+                <rect x="50" y="50" width="120" height="95" rx="8" fill="#e0f2fe" stroke="#0284c7" strokeWidth="2" />
                 <text x="110" y="85" textAnchor="middle" fontSize="16" fontWeight="600" fill="#0c4a6e">User</text>
                 <text x="110" y="105" textAnchor="middle" fontSize="12" fill="#075985">Browser</text>
+                <text x="110" y="125" textAnchor="middle" fontSize="12" fill="#075985">Biometric Identity</text>
 
                 {/* Credential Creation */}
                 <rect x="250" y="30" width="140" height="100" rx="8" fill="#fef3c7" stroke="#d97706" strokeWidth="2" />
                 <text x="320" y="60" textAnchor="middle" fontSize="14" fontWeight="600" fill="#92400e">Credential</text>
-                <text x="320" y="80" textAnchor="middle" fontSize="12" fill="#78350f">Creation</text>
-                <text x="320" y="100" textAnchor="middle" fontSize="11" fill="#78350f">Biometric</text>
+                <text x="320" y="80" textAnchor="middle" fontSize="12" fill="#78350f">Business Card</text>
+                <text x="320" y="100" textAnchor="middle" fontSize="12" fill="#78350f">Registration</text>
 
                 {/* Member List */}
                 <rect x="450" y="50" width="120" height="80" rx="8" fill="#dbeafe" stroke="#2563eb" strokeWidth="2" />
@@ -205,7 +206,7 @@ export default function DocsPage() {
 
                 {/* Arrows – Registration */}
                 <path d="M 170 90 L 250 80" stroke="#0284c7" strokeWidth="2" fill="none" markerEnd="url(#arrowhead)" />
-                <text x="210" y="75" textAnchor="middle" fontSize="10" fill="#0284c7">Create Credential</text>
+                <text x="210" y="75" textAnchor="middle" fontSize="10" fill="#0284c7">Create</text>
 
                 <path d="M 390 80 L 450 90" stroke="#2563eb" strokeWidth="2" fill="none" markerEnd="url(#arrowhead)" />
                 <text x="420" y="75" textAnchor="middle" fontSize="10" fill="#2563eb">Add to List</text>
@@ -234,7 +235,7 @@ export default function DocsPage() {
           <h2>Technology Behind the Experience</h2>
           <div className="protocol-content">
             <p>
-              While you won’t see the inner workings, NS Auth relies on modern web authentication (biometric
+              While you won’t see the inner workings, NSAuth relies on modern web authentication (biometric
               passkeys), a privacy‑preserving proof system, and a globally distributed, signed member list.
               This combination delivers the seamless, secure, and private experience described above.
             </p>

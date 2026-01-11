@@ -1,4 +1,4 @@
-# NS Auth
+# NSAuth
 
 Network States are formed of individuals: Trust is delegated to the collective reputation of a group rather than to a single institution. By anchoring every interaction to a signed, versioned member-list, the network‑state can:
 

@@ -1,32 +1,9 @@
 .graph-container {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 120px);
-  padding: 2rem;
+  height: 600px;
+  padding: 0.5rem;
   gap: 1.5rem;
-}
-
-.graph-header {
-  text-align: center;
-}
-
-.graph-header h1 {
-  margin: 0 0 0.5rem 0;
-  font-size: 2rem;
-  color: #1a1a1a;
-}
-
-.graph-description {
-  color: #666;
-  margin-bottom: 1rem;
-}
-
-.graph-stats {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  font-size: 0.875rem;
-  color: #666;
 }
 
 .graph-wrapper {
@@ -35,7 +12,7 @@
   border-radius: 8px;
   overflow: hidden;
   background: white;
-  min-height: 500px;
+  min-height: 400px;
   cursor: default;
 }
 
@@ -81,16 +58,17 @@
 .close-details {
   margin-top: 1rem;
   padding: 0.5rem 1rem;
-  background: #f3f4f6;
+  background: #ef4444;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
   transition: background 0.2s ease;
+  color: white;
 }
 
 .close-details:hover {
-  background: #e5e7eb;
+  background: #dc2626;
 }
 
 .loading-state,
@@ -120,6 +98,7 @@
   }
 }
 
+.loading-progress,
 .loading-hint {
   color: #666;
   font-size: 0.875rem;
@@ -153,4 +132,3 @@
   margin-top: 0.5rem;
   text-align: center;
 }
-

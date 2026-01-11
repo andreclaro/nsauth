@@ -7,7 +7,7 @@ import '@/components/layout/Layout.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'NS Auth',
+  title: 'NSAuth',
   description: 'Nostr Authentication with WebAuthn',
 };
 

@@ -60,7 +60,7 @@ class ZKPassportService {
       typeof window !== 'undefined' ? `${window.location.origin}/vite.svg` : 'https://example.com/logo.svg';
 
     const queryBuilder = await zkPassport.request({
-      name: 'NS Auth',
+      name: 'NSAuth',
       logo: logoUrl,
       purpose: 'Verify you are over 18 years old',
       scope: 'age-verification',
@@ -117,7 +117,7 @@ class ZKPassportService {
       typeof window !== 'undefined' ? `${window.location.origin}/vite.svg` : 'https://example.com/logo.svg';
 
     const queryBuilder = await zkPassport.request({
-      name: 'NS Auth',
+      name: 'NSAuth',
       logo: logoUrl,
       purpose: 'Complete KYC verification',
       scope: 'kyc-verification',
@@ -179,7 +179,7 @@ class ZKPassportService {
       typeof window !== 'undefined' ? `${window.location.origin}/vite.svg` : 'https://example.com/logo.svg';
 
     const queryBuilder = await zkPassport.request({
-      name: 'NS Auth',
+      name: 'NSAuth',
       logo: logoUrl,
       purpose: 'Verify you are a member (18+ and KYC verified)',
       scope: 'member-verification',
@@ -242,7 +242,7 @@ class ZKPassportService {
       typeof window !== 'undefined' ? `${window.location.origin}/vite.svg` : 'https://example.com/logo.svg';
 
     const queryBuilder = await zkPassport.request({
-      name: 'NS Auth',
+      name: 'NSAuth',
       logo: logoUrl,
       purpose: 'Prove you are a real person',
       scope: 'personhood-verification',

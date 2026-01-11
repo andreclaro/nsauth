@@ -232,7 +232,11 @@ export function ProfilePage() {
         kind: 3,
         content: "",
         created_at: Math.floor(Date.now() / 1000),
-        tags: [["p", publicKey, "wss://relay.damus.io", formData.name || ""]],
+        tags: [
+          ["p", publicKey, "wss://relay.damus.io", formData.name || ""],
+          ["p", "36732cc35fe56185af1b11160a393d6c73a1fe41ddf1184c10394c28ca5d627b", "wss://relay.damus.io", "Balajis"],
+          ["p", "82341f882b6eabcd2ba7f1ef90aad961cf074af15b9ef44a09f9d2a8fbfbe6a2", "wss://relay.damus.io", "Jack"]
+        ],
       };
 
       // Sign event

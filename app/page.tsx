@@ -70,13 +70,13 @@ export default function HomePage() {
     <div className="home-container">
       <div className="home-content">
         {/* ---------- Header ---------- */}
-        <h1>NS Auth</h1>
+        <h1>NSAuth</h1>
         <p className="home-subtitle">One credential, limitless access</p>
 
         {/* ---------- Integrated Description + Features ---------- */}
         <div className="home-description">
           <p>
-            With NS Auth you receive a single, portable credential that unlocks
+            With NSAuth you receive a single, portable credential that unlocks
             both physical spaces and digital services across the entire community.
             Because membership is verified through a cryptographically signed,
             versioned member‑list, you enjoy:
@@ -130,7 +130,7 @@ export default function HomePage() {
 
           {/* Closing sentence that ties back to the description */}
           <p>
-            In short, NS Auth turns a collective reputation into a practical,
+            In short, NSAuth turns a collective reputation into a practical,
             everyday trust layer that lets you work, learn, travel, and govern
             with confidence and autonomy.
           </p>

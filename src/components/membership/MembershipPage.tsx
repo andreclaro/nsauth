@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { nosskeyService } from '../../services/nosskey.service';
 import { relayService } from '../../services/relay.service';
 import { useAuthStore } from '../../store/authStore';
+import { RelationshipGraph } from '../graph/RelationshipGraph';
 import type { ProfileMetadata, FollowEntry } from '../../types/nostr';
 import { useZxing } from 'react-zxing';
 import './Membership.css';
@@ -416,6 +417,15 @@ export function MembershipPage() {
                   </div>
                 );
               })}
+              <div className="graph-section" style={{ marginTop: '1rem' }}>
+                <h2>Your Web Of Trust</h2>
+                <p className="graph-intro">
+                  Below is a visual representation of the relationships you’ve built with other members.
+                </p>
+
+                {/* The graph itself */}
+                <RelationshipGraph />
+              </div>
             </div>
           )}
         </div>
