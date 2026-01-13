@@ -1,8 +1,19 @@
 'use client';
 
-import { RegistrationFlow } from '@/components/auth/RegistrationFlow';
+import { useRouter } from 'next/navigation';
+import { RegistrationFlow, useAuthStore } from 'ns-auth-sdk';
+import { useNSAuth } from '@/providers/NSAuthProvider';
 
 export default function RegisterPage() {
-  return <RegistrationFlow />;
-}
+  const router = useRouter();
+  const { authService } = useNSAuth();
+  const setAuthenticated = useAuthStore((state) => state.setAuthenticated);
 
+  return (
+    <RegistrationFlow
+      authService={authService}
+      setAuthenticated={setAuthenticated}
+      onSuccess={() => router.push('/profile')}
+    />
+  );
+}

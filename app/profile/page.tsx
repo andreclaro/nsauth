@@ -2,12 +2,15 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/store/authStore';
-import { ProfilePage } from '@/components/profile/ProfilePage';
+import { useAuthStore, ProfilePage } from 'ns-auth-sdk';
+import { useNSAuth } from '@/providers/NSAuthProvider';
+import { geminiService } from '@/services/gemini.service';
 
 export default function Profile() {
   const router = useRouter();
+  const { authService, relayService } = useNSAuth();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const publicKey = useAuthStore((state) => state.publicKey);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -19,6 +22,16 @@ export default function Profile() {
     return null;
   }
 
-  return <ProfilePage />;
+  return (
+    <ProfilePage
+      authService={authService}
+      relayService={relayService}
+      publicKey={publicKey}
+      onUnauthenticated={() => router.push('/')}
+      onSuccess={() => router.push('/membership')}
+      onRoleSuggestion={async (about: string) => {
+        return await geminiService.suggestRole(about);
+      }}
+    />
+  );
 }
-
