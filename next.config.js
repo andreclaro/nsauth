@@ -1,7 +1,9 @@
+const path = require('path');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  transpilePackages: ['react-force-graph'],
+  transpilePackages: ['react-force-graph', 'ns-auth-sdk'],
   webpack: (config, { isServer }) => {
     config.resolve.fallback = {
       ...config.resolve.fallback,
@@ -17,7 +19,7 @@ const nextConfig = {
         canvas: false,
       };
     }
-    
+
     return config;
   },
 };

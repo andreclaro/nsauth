@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { useAuthStore } from '../../store/authStore';
-import { nosskeyService } from '../../services/nosskey.service';
+import { useAuthStore } from 'ns-auth-sdk';
+import { useNSAuth } from '@/providers/NSAuthProvider';
 import './Layout.css';
 import { useState, useEffect, useRef } from 'react';
 import { QRCodeSVG } from 'qrcode.react';   // <-- import directly
@@ -11,6 +11,7 @@ import { QRCodeSVG } from 'qrcode.react';   // <-- import directly
 export function Header() {
   const router = useRouter();
   const pathname = usePathname();
+  const { authService } = useNSAuth();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const publicKey = useAuthStore((s) => s.publicKey);
   const logout = useAuthStore((s) => s.logout);
@@ -49,11 +50,11 @@ export function Header() {
   }, []);
 
   useEffect(() => {
-    setHasAccount(nosskeyService.hasKeyInfo());
-  }, [pathname]);
+    setHasAccount(authService.hasKeyInfo());
+  }, [pathname, authService]);
 
   const handleLogout = () => {
-    nosskeyService.clearStoredKeyInfo();
+    authService.clearStoredKeyInfo();
     logout();
     setHasAccount(false);
     router.push('/');
@@ -64,13 +65,13 @@ export function Header() {
     setLoginError(null);
     setMenuOpen(false);
     try {
-      if (!nosskeyService.hasKeyInfo())
+      if (!authService.hasKeyInfo())
         throw new Error('No account found. Please register first.');
 
-      const keyInfo = nosskeyService.getCurrentKeyInfo();
+      const keyInfo = authService.getCurrentKeyInfo();
       if (!keyInfo) throw new Error('Failed to load account information.');
 
-      await nosskeyService.getPublicKey(); // triggers WebAuthn
+      await authService.getPublicKey(); // triggers WebAuthn
       setAuthenticated(keyInfo);
       router.push('/');
     } catch (err) {

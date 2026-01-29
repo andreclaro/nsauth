@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { Header } from '@/components/layout/Header';
+import { NSAuthProvider } from '@/providers/NSAuthProvider';
 import './globals.css';
 import '@/components/layout/Layout.css';
+import 'ns-auth-sdk/styles';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -19,10 +21,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className="layout">
-          <Header />
-          <main className="main-content">{children}</main>
-        </div>
+        <NSAuthProvider>
+          <div className="layout">
+            <Header />
+            <main className="main-content">{children}</main>
+          </div>
+        </NSAuthProvider>
       </body>
     </html>
   );
